@@ -1,0 +1,36 @@
+def model_predict(df , input ) :
+  df_model = df.reset_index()
+  
+  df_model['Date'] = pd.to_datetime( df_model['Date'])
+  df_model['Year'] = df_model['Date'].dt.year
+  df_model['Month'] = df_model['Date'].dt.month
+  df_model['Day'] = df_model['Date'].dt.day
+
+# Drop the original Date column if not needed
+  df_model.drop('Date', axis=1, inplace=True)
+
+  scaler = MinMaxScaler()
+  x = df_model.drop(columns=['Close'])
+  y = df_model['Close']
+  x_scaled = scaler.fit_transform(x)
+  x  = pd.DataFrame(x_scaled , columns=x.columns)
+  df_model = pd.concat( [x , y] , axis=1 )
+  print(df_model.head(2))
+  x = df_model.drop(columns=['Close'])
+  y = df_model['Close']
+  x_train , x_test , y_train , y_test = train_test_split(x , y , test_size=0.3 , random_state=42)
+  model = SGDRegressor(learning_rate='constant' , max_iter=8000 , eta0=0.01 , random_state=42)
+  model.fit(x_train , y_train)
+  y_pred = model.predict(x_test)
+  r2_score = metrics.r2_score(y_true=y_test , y_pred=y_pred)
+  print(f'R2 score is {r2_score}')
+  
+  df_input = pd.DataFrame(input , columns=x_train.columns)
+  df_input['Date'] = pd.to_datetime( df_input['Date'])
+  df_input['Year'] = df_input['Date'].dt.year
+  df_input['Month'] = df_input['Date'].dt.month
+  df_input['Day'] = df_input['Date'].dt.day
+  df_input.drop(columns=['Date'] , inplace=True)
+  df_input = scaler.transform(df_input)
+  prediction = model.predict(df_input)
+  return prediction

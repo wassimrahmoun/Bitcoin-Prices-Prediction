@@ -1,0 +1,317 @@
+- st.write(…)
+- st.set_page_config(…).
+
+to launch the server : streamlit run *script.py*
+
+- Elements of streamlit :
+Text elements
+Input widgets
+Layout
+Visualization of data and graphs
+Additional elements
+
+- The various elements can be integrated without special configurations , Personalization via certain arguments.
+
+- Some arguments are common to all (or most) of the elements:
+ label ( describes the functionnality of that element ) , label_visibility ( visible , hidden , collapsed ) ,
+ disabled ( boolean flag to disable an element. Useful for making a widget available only if a certain condition occurs ) ,
+ use_container_width ( boolean flag to fit the size of the widget to that of the container it is part of ) . 
+ key ( string or int , to uniquely identify the widget , if omitted , it's generated based on the content ).
+
+- Text elements ( ready to use elements with the ability to customize the color and insert emojis ) :
+st.title(' hey :red[hello] ' )
+st.header(...)
+st.subheader(...)
+st.text(...)
+
+. Markdown : It is possible to insert strings formatted according to the markdown language ( of jupyter ).
+
+# (*Header 1*) 
+## (*Header 2*)
+### (*Header 3*)
+**(*bold*)**
+> (*blockquote*)
+* (*Item 1*)
+* (*Item 2*)
+_(*italics*)_ 
+Line␣␣
+Break
+
+. You can also use markdown to insert HTML code for more personalization ( we need : unsafe_allow_html = True ).
+st.markdown( htmlText , unsafe_allow_html = True ) 
+
+
+- Input Widgets :
+
+. Button :  
+st.button(label, key=None, help=None, on_click=None, args=None, kwargs=None, type="secondary", disabled=False, 
+use_container_width=False)
+
+. Checkbox : 
+st.checkbox(label, value=False, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False, 
+label_visibility="visible")
+
+
+ex :
+
+if st.checkbox("Accept the Agreement") : st.write("Thanks for accepting the agreement.")
+ else : st.write("You have to accept the agreement to proceed.")
+
+ex 2 :
+st.markdown("### Courses pusruied in the AIDS specialization:")
+course_list = ['...' , '....' , '.....' , '......']
+
+if st.button('Show' , type='primary' ) :  st.write(course_list)
+
+. Input text : 
+st.text_input(label, value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, on_change=None, args=None, kwargs=None, *, placeholder=None, disabled=False, label_visibility="visible" )
+. Number :
+st.number_input(label, min_value=None, max_value=None, value=, step=None, format=None, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False, label_visibility="visible")
+. Date :
+st.date_input(label, value=None, min_value=None, max_value=None, key=None, help=None, 
+on_change=None, args=None, kwargs=None, *, disabled=False, label_visibility="visible")
+
+Ex :
+name = st.text_input("Full Name" , placeholder = 'e.g. Belkacem Khaldi" )
+age = st.number_input(" Age ? " , min_value = 20 , max_value = 100 )
+date_ = st.date_input("Select a date range " , value = (datetime.date(2023,12,1) , datetime.date(2024 , 1 , 31 ) ) )
+
+. Select Box : 
+st.selectbox(label, options, index=0, format_func=special_internal_function, key=None,help=None,on_change=None, args=None, kwargs=None, *, disabled=False, label_visibility="visible")
+
+. MultiSelect : 
+st.multiselect(label, options, default=None, format_func=special_internal_function, key=None,
+help=None, on_change=None, args=None, kwargs=None, *, disabled=False, label_visibility="visible", 
+max_selections=None)
+
+ex :
+option = st.selectbox("Choose a Model to train: " , ('opt1' , 'opt2' ) )
+options = st.multiselect("Select the metric to analyse: " , ("RMSE" , "MAE" , "R-square" ) )
+
+
+. Radio Button :
+st.radio(label, options, 
+index=0, format_func=special_internal_function, key=None, help=None, on_change=None, 
+args=None, kwargs=None, *, disabled=False, horizontal=False, label_visibility="visible") 
+
+ex : 
+model_choise = st.radio('...…..' , ['opt1' , 'opt2' ] )
+if model_choice == 'opt1' : 
+ else …
+
+. Slider :
+st.slider(label, min_value=None, max_value=None, value=None,step=None,
+format=None,key=None, help=None, on_change=None, args=None, 
+kwargs=None, *, disabled=False, label_visibility="visible")
+
+ex :
+age = st.slider("How old are you ? , 18 , 100 , 21 ) # simple slider
+values = st.slider("Select a range of values: " , 0.0 , 100.0 , (25.0 , 75.0) ) # range slider
+appointement = st.slider("Book Your Appointment: " , value=(time(11,30) , time(12,45) ) ) # range time slider
+start_time = st.slider("When do you expect to start?" , value=datetime(2020 , 1 , 1 , 9 , 30 ) ,
+format="MM/DD/YY - hh:mm") # datetime slider
+
+. Form : 
+st.form(key, clear_on_submit=False )
+
+ex :
+
+with st.form("form"):
+    st.subheader("ML Model Entry Form")
+    df_data = st.file_uploader('Upload your own data frame')
+    x_features = st.multiselect("select the input features:",
+                                 ("Col 1",
+                                  "Col 2",
+                                  "Col 3")
+                                )
+    y_feature = st.text_input("Identify your output Feature", placeholder="e.g. feature 1")
+
+    model_choice = st.radio("Which ML model do you want to train?",
+                             ["LinReg", "LogReg"])
+    
+    # Simple Slider
+    epochs = st.slider("How many epochs for the training process?", 100, 500, 300)
+
+    # Every form must have a submit form
+    submitted = st.form_submit_button("Train the model")
+
+if submitted:
+    # Handle submitted form data
+    pass
+
+
+- Data visualization :
+. Metric :
+st.metric(label, value, delta=None,
+delta_color="normal", help=None,label_visibility="visible")
+
+ex :
+
+st.metric("Close Price", "[$304.08:.2f]")
+st.metric("Price Difference (YoY)", "[$21.61:.2f]", "[7.63:.2f]%")
+st.metric("52-Week High", "[$305.20:.2f]", "-2.63:.2f]%")
+st.metric("52-Week Low", "[$213.43:.2f]", "-1.05:.2f]%")
+# The .2f in the format string represents the number of decimal places to display for a floating-point value.
+
+. DataFrame :
+st.dataframe(data=None, width=None, 
+height=None, *, 
+use_container_width=False, 
+hide_index=None, 
+column_order=None, 
+column_config=None)
+
+ex :
+
+from datetime import datetime
+import pandas_datareader.data as pdr
+
+st.markdown('# Streamlit :red[Tutorial]')
+st.markdown('### Loading Data From DataReader: :blue[Stooq Index Data]')
+
+start_date = datetime(2023, 11, 1)
+end_date = datetime(2023, 12, 30)
+df = pdr.DataReader('BAC', 'stooq', start=start_date, end=end_date)
+
+st.dataframe(df.style.highlight_max(axis=0), use_container_width=True)
+
+# This code is using the pandas-datareader library to fetch stock data from the Stooq index for the ticker "BAC" (Bank of America) between November 1, 2023 and December 30, 2023. It then displays the resulting DataFrame using Streamlit's st.dataframe() function, with the maximum values in each column highlighted.
+
+. Charts : several are supported like : Matplotlib , Plotly , Altair , deck.gl (maps and 3D graphs ) 
+To speed up the integration of the most common charts, some are natively integrated into Streamlit (with less customization): Line chart , Area chart , Bar chart , Scatterplot on map.
+
++ Line chart :
+st.line_chart(data=None, *, x=None, y=None,
+ width=0, height=0, use_container_width=True )
+
+ex :
+st.line_chart(data=df , y=["Open" , "High" , "Low" , "Close" ] , width=0 , height=0 , use_container_width = True )
+
+
++ Bar chart :
+st.bar_chart(…)
+
+ex :
+st.bar_chart(data=df , y=["Open" , "High" , "Low" , "Close" ] , width=0 , height=0 , use_container_width = True )
+
++ Map chart : 
+st.map(data=None, *, latitude=None, longitude=None, color=None, 
+size=None, zoom=None, use_container_width=True)
+
+ex :
+df = pd.DataFrame(
+    np.random.randn(1000, 2) / [10, 10] + [35.2, -0.641389],
+    columns=['lat', 'lon']
+)
+
+st.map(df)
+
+# The data parameter must have two columns: 'lat' or 'latitude', and 'lon' or 'longitude'.
+ The map relies on the external service Mapbox and requires a token (currently offered
+automatically by Streamlit)
+
+* Advanced charts using Plotly :
+ + Map chart : 
+st.plotly_chart(figure_or_data, 
+use_container_width=False, sharing="streamlit", theme="streamlit", **kwargs)
+
+ex :
+import streamlit as st
+import plotly.express as px
+
+st.markdown('# Streamlit :red[Tutorial]')
+st.markdown('### Advanced Chart using :blue[Plotly]')
+
+df = px.data.iris()
+
+fig = px.scatter(df, x='sepal_length', y='sepal_width', 
+                 color='species', size='petal_length')
+
+st.plotly_chart(fig, use_container_width=True)
+
+
+- Additional Elements :
+
+. Status Messages and Spinners :
+
+st.error(body, *, icon=None)          st.spinner(text="In progress...", *, cache=False)
+st.warning(body, *, icon=None) 
+st.info(body, *, icon=None)
+st.success(body, *, icon=None)
+
+ex :
+import time
+st.info('Your model has been trained', icon="ℹ️")
+st.error("An error has occurred during training your model", icon="🚨")
+
+with st.spinner('Wait for it...'):
+    time.sleep(5)
+st.success('Model completely trained')
+
+. Progress Bars and Session state :
++ Progress Bar : st.progress(value, text=None)
++ Session State.
+
+ex :
+progress_text = "Model Training in progress. Please wait."
+my_bar = st.progress(0, text=progress_text)
+
+for percent_complete in range(100):
+    time.sleep(0.01)
+    my_bar.progress(percent_complete + 1, text=progress_text)
+    time.sleep(1)
+
+- Layout :
+ . Sidebar :
+  with st.sidebar:
+    # Add UI
+Ex :
+
+from streamlit_option_menu import option_menu
+with st.sidebar :
+ selected = option_menu("Multiple Disease Prediction System", 
+                      ['Diabetes Prediction', 'Heart Disease Prediction', 'Parkinsons Prediction'],
+                      icons=['activity', 'heart', 'person'],
+                      default_index=0)
+ . Tab :
+ t.tabs(tabs)
+
+Ex :
+tab1, tab2 = st.tabs(["Heart Disease", "Diabetes Disease"])
+
+with tab1:
+    st.header("Cardiovascular Disease")
+    st.image("https://www.endocrine.org/-/media/endocrine/images/patient-engagement-webpage/condition-page-images/cardiovascular-disease/cardio_disease_t2d_pe_1796x943.jpg")
+
+with tab2:
+    st.header("Kidney Failure and Diabetes") 
+    st.image("https://www.cdc.gov/diabetes/images/library/features/kidney-failure-diabetes.jpg?_=32439")
+
+. Column : ( so that in the same page ( or tab ) , show multiple photos (or else) side by side )
+st.columns(spec, *, gap="small")
+
+Ex : 
+col1, col2 = st.columns(2)
+
+with col1:
+    st.header("Cardiovascular Disease")
+    st.image("https://www.endocrine.org/-/media/endocrine/images/patient-engagement-webpage/condition-page-images/cardiovascular-disease/cardio_disease_t2d_pe_1796x943.jpg")
+
+with col2:
+    st.header("Kidney Failure and Diabetes") 
+    st.image("https://www.cdc.gov/diabetes/images/library/features/kidney-failure-diabetes.jpg?_=32439")
+
+. Expander : ( hide infos , show only label , when expanded show all infos )
+st.expander(label, expanded=False)
+
+Ex :
+with st.expander('label 1 ') :
+    st.header("Cardiovascular Disease")
+    st.image("https://www.endocrine.org/-/media/endocrine/images/patient-engagement-webpage/condition-page-images/cardiovascular-disease/cardio_disease_t2d_pe_1796x943.jpg")
+
+with st.expander('label 2 ') :
+    st.header("Kidney Failure and Diabetes") 
+    st.image("https://www.cdc.gov/diabetes/images/library/features/kidney-failure-diabetes.jpg?_=32439")
+
+
+
